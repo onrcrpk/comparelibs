@@ -11,10 +11,10 @@
 
         body {
             display: flex;
+            flex-direction: column;
             justify-content: center;
             align-items: center;
             height: 100vh;
-            flex-wrap: wrap;
             background: url('https://images.pexels.com/photos/172277/pexels-photo-172277.jpeg') no-repeat center center fixed;
             background-size: cover;
             margin: 0;
@@ -23,14 +23,20 @@
         }
 
         h1 {
-            position: absolute;
-            top: 5%;
-            left: 50%;
-            transform: translateX(-50%);
             color: white;
             font-family: 'Montserrat', sans-serif;
             font-size: 44px;
             text-shadow: 2px 2px 5px rgba(0, 0, 0, 0.7);
+            margin-top: 20px;
+            text-align: center;
+        }
+
+        .card-container {
+            display: flex;
+            flex-wrap: wrap;
+            justify-content: center;
+            align-items: center;
+            margin-top: 20px;
         }
 
         .card {
@@ -38,7 +44,7 @@
             border-radius: 15px;
             width: 350px;
             height: 150px;
-            margin: 50px;
+            margin: 20px;
             display: flex;
             justify-content: center;
             align-items: center;
@@ -55,12 +61,34 @@
         .card:hover {
             transform: scale(1.1) translateY(-10px);
             box-shadow: 5px 15px 18px rgba(0, 0, 0, 0.5);
-            background: linear-gradient(to right, #ffab6c, #ff8f3c);        }
+            background: linear-gradient(to right, #ffab6c, #ff8f3c);
+        }
+
+        @media only screen and (max-width: 600px) {
+            /* CSS rules for screens smaller than 600px */
+            .card-container {
+                flex-direction: column;
+            }
+
+            .card {
+                width: 80%;
+            }
+
+            .card p {
+                font-size: 18px;
+            }
+        }
     </style>
 </head>
 <body>
     <h1>Leaflet vs OpenLayers: Code Comparison</h1>
-    <a href="ikimap.html" class="card">A simple map with a marker and popup</a>
-    <a href="clustermaps.html" class="card">A simple map with marker clustering</a>
+    <div class="card-container">
+        <a href="ikimap.html" class="card">
+            <p>A simple map with a marker and popup</p>
+        </a>
+        <a href="clustermaps.html" class="card">
+            <p>A simple map with marker clustering</p>
+        </a>
+    </div>
 </body>
 </html>
