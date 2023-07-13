@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
-    <title>Leaflet vs OpenLayers</title>
+    <title>Leaflet vs OpenLayers: Code Comparison</title>
 
     <!-- Custom CSS -->
     <style>
@@ -15,7 +15,7 @@
             align-items: center;
             height: 100vh;
             flex-wrap: wrap;
-            background: url('https://images.unsplash.com/photo-1548092372-0d1bd40894a3?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=1170&q=80') no-repeat center center fixed;
+            background: url('https://images.pexels.com/photos/172277/pexels-photo-172277.jpeg') no-repeat center center fixed;
             background-size: cover;
             margin: 0;
             padding: 0;
@@ -27,40 +27,40 @@
             top: 5%;
             left: 50%;
             transform: translateX(-50%);
-            color: #fff;
+            color: white;
             font-family: 'Montserrat', sans-serif;
-            font-size: 2.5em;
+            font-size: 44px;
             text-shadow: 2px 2px 5px rgba(0, 0, 0, 0.7);
         }
 
         .card {
-            background: linear-gradient(to right, #6a11cb 0%, #2575fc 100%);
+            background: linear-gradient(to right, #ffbb80, #ff9e54);
             border-radius: 15px;
-            width: 220px;
-            height: 100px;
-            margin: 20px;
+            width: 350px;
+            height: 150px;
+            margin: 50px;
             display: flex;
             justify-content: center;
             align-items: center;
             text-decoration: none;
             color: white;
-            font-size: 16px;
+            font-size: 22px;
             text-align: center;
             padding: 20px;
             box-shadow: 5px 10px 18px rgba(0, 0, 0, 0.25);
             transition: all 0.5s ease-in-out;
+            font-weight: bold;
         }
 
         .card:hover {
             transform: scale(1.1) translateY(-10px);
             box-shadow: 5px 15px 18px rgba(0, 0, 0, 0.5);
-            background: linear-gradient(to right, #6a11cb 0%, #3f8efc 100%);
-        }
+            background: linear-gradient(to right, #ffab6c, #ff8f3c);        }
     </style>
 </head>
 <body>
-    <h1>Leaflet vs OpenLayers Code Comparison</h1>
-    <a href="ikimap.html" class="card">A simple map with a popup.</a>
-    <a href="clustermaps.html" class="card">A simple map with a marker cluster.</a>
+    <h1>Leaflet vs OpenLayers: Code Comparison</h1>
+    <a href="ikimap.html" class="card">A simple map with a marker and popup</a>
+    <a href="clustermaps.html" class="card">A simple map with marker clustering</a>
 </body>
 </html>
