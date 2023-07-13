@@ -4,7 +4,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>A simple map with a cluster</title>
+    <title>A simple map with marker clustering</title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/leaflet.css" integrity="sha512-Zcn6bjR/8RZbLEpLIeOwNtzREBAJnUKESxces60Mpoj+2okopSAcSUIUOseddDm0cxnGQzxIR7vJgsLZbdLE3w==" crossorigin="anonymous" referrerpolicy="no-referrer" />
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/leaflet.markercluster/1.5.3/MarkerCluster.Default.css" integrity="sha512-6ZCLMiYwTeli2rVh3XAPxy3YoR5fVxGdH/pz+KMCzRY2M65Emgkw00Yqmhh8qLGeYQ3LbVZGdmOX9KUjSKr0TA==" crossorigin="anonymous" referrerpolicy="no-referrer" />
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/leaflet.markercluster/1.5.3/MarkerCluster.Default.min.css" integrity="sha512-fYyZwU1wU0QWB4Yutd/Pvhy5J1oWAwFXun1pt+Bps04WSe4Aq6tyHlT4+MHSJhD8JlLfgLuC4CbCnX5KHSjyCg==" crossorigin="anonymous" referrerpolicy="no-referrer" />
@@ -84,12 +84,12 @@
 <body>
     <div class="content">
         <h2>Leaflet vs OpenLayers Comparison</h1>
-            <h3>A simple map with cluster (5000 Random Points)</h3>
+            <h3>A simple map with marker clustering</h3>
             <div class="maps-row">
                 <div class="map-box">
                     <div id="leaflet-map" class="map"></div>
                     <div id="leaflet-code">
-                        <h2>Leaflet Code:</h2>
+                        <h2>Leaflet</h2>
                         <pre>
               <code id="leaflet-code-content"></code>
             </pre>
@@ -98,7 +98,7 @@
                 <div class="map-box">
                     <div id="openlayers-map" class="map"></div>
                     <div id="openlayers-code">
-                        <h2>OpenLayers Code:</h2>
+                        <h2>OpenLayers</h2>
                         <pre>
               <code id="openlayers-code-content"></code>
             </pre>
@@ -110,27 +110,38 @@
             </div>
             <script>
               
-// Initialize the Leaflet map and tile layer
-var leafletMap = L.map('leaflet-map').setView([50, 0], 2);
 
-L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {maxZoom: 18}).addTo(leafletMap);
-
-// Initialize marker cluster group
-var markers = L.markerClusterGroup();
-
-// Generate 2000 random markers and add them to the cluster group directly
+var markersArray = [];
 for (var i = 0; i < 5000; i++) {
-    markers.addLayer(L.marker([Math.random() * 180 - 90, Math.random() * 360 - 180]));
+    markersArray.push(L.marker([Math.random() * 180 - 90, Math.random() * 360 - 180]));
 }
 
-// Add the marker cluster group to the map
-leafletMap.addLayer(markers);
-
-document.getElementById('leaflet-code-content').innerHTML = Prism.highlight(`
-// Creates a new Leaflet map in the HTML element with the id 'leaflet-map', centers it at the given coordinates (latitude 52.2, longitude 6.9) and sets the initial zoom level to 10.
 var leafletMap = L.map('leaflet-map').setView([0, 0], 2);
 
-// Creates a tile layer using OpenStreetMap tiles and adds it to the map. The maxZoom option is set to 18.
+L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+    maxZoom: 18
+}).addTo(leafletMap);
+
+var markers = L.markerClusterGroup();
+
+for (var i = 0; i < markersArray.length; i++) {
+    markers.addLayer(markersArray[i]);
+}
+
+leafletMap.addLayer(markers);
+
+
+document.getElementById('leaflet-code-content').innerHTML = Prism.highlight(`
+// Generate 5000 random points
+var markersArray = [];
+for (var i = 0; i < 5000; i++) {
+    markersArray.push(L.marker([Math.random() * 180 - 90, Math.random() * 360 - 180]));
+}
+
+// Set up the map with initial view settings
+var leafletMap = L.map('leaflet-map').setView([0, 0], 2);
+
+// Add OpenStreetMap tile layer to the map
 L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
     maxZoom: 18
 }).addTo(leafletMap);
@@ -138,25 +149,30 @@ L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
 // Initialize marker cluster group
 var markers = L.markerClusterGroup();
 
-// Generate 2000 random markers and add them to the cluster group directly
-for (var i = 0; i < 5000; i++) {
-    markers.addLayer(L.marker([Math.random() * 180 - 90, Math.random() * 360 - 180]));
+// Add generated markers to the cluster group
+for (var i = 0; i < markersArray.length; i++) {
+    markers.addLayer(markersArray[i]);
 }
 
 // Add the marker cluster group to the map
-leafletMap.addLayer(markers);
+leafletMap.addLayer(markers);`, Prism.languages.javascript, 'javascript');
 
-`, Prism.languages.javascript, 'javascript');
+// Generate 5000 random points
+const features = [];
+for (let i = 0; i < 5000; i++) {
+    features.push(new ol.Feature(new ol.geom.Point(ol.proj.fromLonLat([Math.random() * 360 - 180, Math.random() * 180 - 90]))));
+}
 
-// Generate random points globally
-const features = Array.from({ length: 5000 }, () => new ol.Feature(new ol.geom.Point(ol.proj.fromLonLat([Math.random() * 360 - 180, Math.random() * 180 - 90]))));
-
+// Set up cluster source with generated features
 const clusterSource = new ol.source.Cluster({
     distance: 80,
     source: new ol.source.Vector({ features }),
 });
 
+// Define style cache
 const styleCache = {};
+
+// Create cluster layer with dynamic styling
 const clusters = new ol.layer.Vector({
     source: clusterSource,
     style: (feature) => {
@@ -174,60 +190,7 @@ const clusters = new ol.layer.Vector({
     },
 });
 
-const openLayersMap = new ol.Map({
-    layers: [
-        new ol.layer.Tile({ source: new ol.source.OSM() }),
-        clusters
-    ],
-    target: "openlayers-map",
-    view: new ol.View({
-        center: ol.proj.fromLonLat([0, 50]),
-        zoom: 2,
-    }),
-});
-
-openLayersMap.on("singleclick", function(evt) {
-    openLayersMap.forEachFeatureAtPixel(evt.pixel, function(feature, layer) {
-        const features = feature.get("features");
-        if (features.length > 1) {
-            const extent = features.reduce((extent, feature) => ol.extent.extend(extent, feature.getGeometry().getExtent()), ol.extent.createEmpty());
-            openLayersMap.getView().fit(extent, {
-                duration: 1000,
-                padding: [50, 50, 50, 50],
-            });
-        }
-    });
-});
-
-
-
-document.getElementById('openlayers-code-content').innerHTML = Prism.highlight(`
-// Generate random points globally
-const features = Array.from({ length: 5000 }, () => new ol.Feature(new ol.geom.Point(ol.proj.fromLonLat([Math.random() * 360 - 180, Math.random() * 180 - 90]))));
-
-const clusterSource = new ol.source.Cluster({
-    distance: 80,
-    source: new ol.source.Vector({ features }),
-});
-
-const styleCache = {};
-const clusters = new ol.layer.Vector({
-    source: clusterSource,
-    style: (feature) => {
-        const size = feature.get("features").length;
-        return styleCache[size] = styleCache[size] || new ol.style.Style({
-            image: new ol.style.Circle({
-                radius: 10,
-                fill: new ol.style.Fill({ color: "#ff6b6b" }),
-            }),
-            text: new ol.style.Text({
-                text: size.toString(),
-                fill: new ol.style.Fill({ color: "#fff" }),
-            }),
-        });
-    },
-});
-
+// Create the map with OSM and cluster layers, and initial view settings
 const openLayersMap = new ol.Map({
     layers: [
         new ol.layer.Tile({ source: new ol.source.OSM() }),
@@ -240,6 +203,7 @@ const openLayersMap = new ol.Map({
     }),
 });
 
+// Add click event to handle feature selection and fitting to multiple features
 openLayersMap.on("singleclick", function(evt) {
     openLayersMap.forEachFeatureAtPixel(evt.pixel, function(feature, layer) {
         const features = feature.get("features");
@@ -253,7 +217,66 @@ openLayersMap.on("singleclick", function(evt) {
     });
 });
 
-`, Prism.languages.javascript, 'javascript');;
+document.getElementById('openlayers-code-content').innerHTML = Prism.highlight(`
+// Generate 5000 random points
+const features = [];
+for (let i = 0; i < 5000; i++) {
+    features.push(new ol.Feature(new ol.geom.Point(ol.proj.fromLonLat([Math.random() * 360 - 180, Math.random() * 180 - 90]))));
+}
+
+// Set up cluster source with generated features
+const clusterSource = new ol.source.Cluster({
+    distance: 80,
+    source: new ol.source.Vector({ features }),
+});
+
+// Define style cache
+const styleCache = {};
+
+// Create cluster layer with dynamic styling
+const clusters = new ol.layer.Vector({
+    source: clusterSource,
+    style: (feature) => {
+        const size = feature.get("features").length;
+        return styleCache[size] = styleCache[size] || new ol.style.Style({
+            image: new ol.style.Circle({
+                radius: 10,
+                fill: new ol.style.Fill({ color: "#ff6b6b" }),
+            }),
+            text: new ol.style.Text({
+                text: size.toString(),
+                fill: new ol.style.Fill({ color: "#fff" }),
+            }),
+        });
+    },
+});
+
+// Create the map with OSM and cluster layers, and initial view settings
+const openLayersMap = new ol.Map({
+    layers: [
+        new ol.layer.Tile({ source: new ol.source.OSM() }),
+        clusters
+    ],
+    target: "openlayers-map",
+    view: new ol.View({
+        center: ol.proj.fromLonLat([0, 50]),
+        zoom: 1,
+    }),
+});
+
+// Add click event to handle feature selection and fitting to multiple features
+openLayersMap.on("singleclick", function(evt) {
+    openLayersMap.forEachFeatureAtPixel(evt.pixel, function(feature, layer) {
+        const features = feature.get("features");
+        if (features.length > 1) {
+            const extent = features.reduce((extent, feature) => ol.extent.extend(extent, feature.getGeometry().getExtent()), ol.extent.createEmpty());
+            openLayersMap.getView().fit(extent, {
+                duration: 1000,
+                padding: [50, 50, 50, 50],
+            });
+        }
+    });
+});`, Prism.languages.javascript, 'javascript');;
             </script>
 </body>
 
