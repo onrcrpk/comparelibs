@@ -5,7 +5,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>A simple map with a popup</title>
+    <title>A simple map with a marker and popup</title>
 
    
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/leaflet.css" integrity="sha512-Zcn6bjR/8RZbLEpLIeOwNtzREBAJnUKESxces60Mpoj+2okopSAcSUIUOseddDm0cxnGQzxIR7vJgsLZbdLE3w==" crossorigin="anonymous" referrerpolicy="no-referrer" />
@@ -90,7 +90,7 @@ h3 {
     
     <div class="content">
     <h2>Leaflet vs OpenLayers Comparison</h1>
-    <h3>A simple map with a popup</h3>
+    <h3>A simple map with a marker and popup</h3>
 
     <div class="maps-row">
         <div class="map-box">
@@ -138,16 +138,21 @@ leafletMarker.bindPopup('Faculty ITC');
 
 
 document.getElementById('leaflet-code-content').innerHTML = Prism.highlight(`
+// Set up the map with initial view settings
 var leafletMap = L.map('leaflet-map').setView([52.2, 6.9], 10);
 
+// Add control scale on the map
 L.control.scale({metric: true, imperial: false}).addTo(leafletMap);
 
+// Add OpenStreetMap tile layer to the map
 L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
     maxZoom: 18
 }).addTo(leafletMap);
 
+// Create a marker at the coordinates [52.2378, 6.8545] and add it to the leafletMap.
 var leafletMarker = L.marker([52.2378, 6.8545]).addTo(leafletMap);
 
+// Attach a popup with the content "Faculty ITC" to the leafletMarker.
 leafletMarker.bindPopup('Faculty ITC');
 `, Prism.languages.javascript, 'javascript');
 
@@ -203,47 +208,58 @@ openLayersMap.on('click', function (event) {
 
 
 document.getElementById('openlayers-code-content').innerHTML =  Prism.highlight(`
+// Create a new OpenLayers map instance
 var openLayersMap = new ol.Map({
     target: 'openlayers-map',
     layers: [new ol.layer.Tile({ source: new ol.source.OSM() })],
     view: new ol.View({ center: ol.proj.fromLonLat([6.9, 52.2]), zoom: 10 })
 });
 
+// Add a scale line control to the map
 openLayersMap.addControl(new ol.control.ScaleLine());
 
+// Create a marker feature at the specified coordinates
 var openLayersMarker = new ol.Feature({
     geometry: new ol.geom.Point(ol.proj.fromLonLat([6.8545, 52.2378]))
 });
 
+// Set the style for the marker
 openLayersMarker.setStyle(new ol.style.Style({
     image: new ol.style.Icon({ src: 'https://openlayers.org/en/latest/examples/data/icon.png' })
 }));
 
+// Create a vector layer and add the marker feature to it
 openLayersMap.addLayer(new ol.layer.Vector({
     source: new ol.source.Vector({ features: [openLayersMarker] })
 }));
 
+// Create an overlay for the popup
 var overlay = new ol.Overlay({
     element: document.getElementById('popup'),
     positioning: 'bottom-center',
     stopEvent: false
 });
 
+// Add the overlay to the map
 openLayersMap.addOverlay(overlay);
 
-
+// Listen for click events on the map
 openLayersMap.on('click', function (event) {
+    // Get the clicked feature, if any
     var feature = openLayersMap.forEachFeatureAtPixel(event.pixel, function (feature) {
         return feature;
     });
 
     if (feature) {
+        // Show the popup at the marker's coordinates
         overlay.setPosition(feature.getGeometry().getCoordinates());
-        
+
+        // Set the content and style of the popup
         var popupContent = document.getElementById('popup-content');
         popupContent.innerHTML = 'Faculty ITC';
         popupContent.style.cssText = "font-family: Arial, sans-serif; font-size: 14px; color: #333; padding: 10px; background: #fff; border: 1px solid #ccc; border-radius: 4px; box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);";
     } else {
+        // Hide the popup if no feature is clicked
         overlay.setPosition(undefined);
     }
 });
