@@ -1,0 +1,260 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>A simple map with a cluster</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/leaflet.css" integrity="sha512-Zcn6bjR/8RZbLEpLIeOwNtzREBAJnUKESxces60Mpoj+2okopSAcSUIUOseddDm0cxnGQzxIR7vJgsLZbdLE3w==" crossorigin="anonymous" referrerpolicy="no-referrer" />
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/leaflet.markercluster/1.5.3/MarkerCluster.Default.css" integrity="sha512-6ZCLMiYwTeli2rVh3XAPxy3YoR5fVxGdH/pz+KMCzRY2M65Emgkw00Yqmhh8qLGeYQ3LbVZGdmOX9KUjSKr0TA==" crossorigin="anonymous" referrerpolicy="no-referrer" />
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/leaflet.markercluster/1.5.3/MarkerCluster.Default.min.css" integrity="sha512-fYyZwU1wU0QWB4Yutd/Pvhy5J1oWAwFXun1pt+Bps04WSe4Aq6tyHlT4+MHSJhD8JlLfgLuC4CbCnX5KHSjyCg==" crossorigin="anonymous" referrerpolicy="no-referrer" />
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/prism/9000.0.1/themes/prism-coy.min.css" rel="stylesheet" />
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/9000.0.1/prism.min.js"></script>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+        }
+
+        .content {
+            max-width: 97%;
+            margin: 0 auto;
+        }
+
+        h1,
+        h2,
+        h3 {
+            text-align: center;
+            margin: 10px 0;
+        }
+
+        h2 {
+            font-size: 25px;
+            color: #333;
+            margin-bottom: 1px;
+        }
+
+        h3 {
+            font-size: 20px;
+            color: #d89339;
+            margin-top: 1px;
+        }
+
+        .map-container {
+            display: flex;
+            flex-direction: column;
+            margin-bottom: 20px;
+        }
+
+        .maps-row {
+            display: flex;
+            justify-content: space-between;
+            flex-wrap: wrap;
+        }
+
+        .map-box {
+            width: 45%;
+            margin-bottom: 20px;
+        }
+
+        .map {
+            height: 300px;
+        }
+
+        pre {
+            background-color: rgb(255, 248, 240);
+            padding: 10px;
+            overflow: auto;
+            white-space: pre-wrap;
+            /* wrap text according to window size */
+            max-height: 400px;
+            /* Adjust the value as needed */
+            border: 1px solid #ddd;
+            /* border to make the box stand out */
+            border-radius: 5px;
+            /* rounded corners for a softer look */
+        }
+    </style>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.7.0/jquery.min.js" integrity="sha512-3gJwYpMe3QewGELv8k/BX9vcqhryRdzRMxVfq6ngyWXwo03GFEzjsUm8Q7RZcHPHksttq7/GFoxjCVUjkjvPdw==" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
+    <script src="https://cdn.jsdelivr.net/npm/ol@v7.4.0/dist/ol.js"></script>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/ol@v7.4.0/ol.css">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/leaflet.js" integrity="sha512-BwHfrr4c9kmRkLw6iXFdzcdWV/PGkVgiIyIWLLlTSXzWQzxuSg4DiQUCpauz/EWjgk5TYQqX/kvn9pG1NpYfqg==" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/leaflet.markercluster/1.5.3/leaflet.markercluster.js" integrity="sha512-OFs3W4DIZ5ZkrDhBFtsCP6JXtMEDGmhl0QPlmWYBJay40TT1n3gt2Xuw8Pf/iezgW9CdabjkNChRqozl/YADmg==" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
+</head>
+
+<body>
+    <div class="content">
+        <h2>Leaflet vs OpenLayers Comparison</h1>
+            <h3>A simple map with cluster (5000 Random Points)</h3>
+            <div class="maps-row">
+                <div class="map-box">
+                    <div id="leaflet-map" class="map"></div>
+                    <div id="leaflet-code">
+                        <h2>Leaflet Code:</h2>
+                        <pre>
+              <code id="leaflet-code-content"></code>
+            </pre>
+                    </div>
+                </div>
+                <div class="map-box">
+                    <div id="openlayers-map" class="map"></div>
+                    <div id="openlayers-code">
+                        <h2>OpenLayers Code:</h2>
+                        <pre>
+              <code id="openlayers-code-content"></code>
+            </pre>
+                    </div>
+                </div>
+            </div>
+            <div id="popup" class="ol-popup">
+                <div id="popup-content"></div>
+            </div>
+            <script>
+              
+// Initialize the Leaflet map and tile layer
+var leafletMap = L.map('leaflet-map').setView([50, 0], 2);
+
+L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {maxZoom: 18}).addTo(leafletMap);
+
+// Initialize marker cluster group
+var markers = L.markerClusterGroup();
+
+// Generate 2000 random markers and add them to the cluster group directly
+for (var i = 0; i < 5000; i++) {
+    markers.addLayer(L.marker([Math.random() * 180 - 90, Math.random() * 360 - 180]));
+}
+
+// Add the marker cluster group to the map
+leafletMap.addLayer(markers);
+
+document.getElementById('leaflet-code-content').innerHTML = Prism.highlight(`
+// Creates a new Leaflet map in the HTML element with the id 'leaflet-map', centers it at the given coordinates (latitude 52.2, longitude 6.9) and sets the initial zoom level to 10.
+var leafletMap = L.map('leaflet-map').setView([0, 0], 2);
+
+// Creates a tile layer using OpenStreetMap tiles and adds it to the map. The maxZoom option is set to 18.
+L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+    maxZoom: 18
+}).addTo(leafletMap);
+
+// Initialize marker cluster group
+var markers = L.markerClusterGroup();
+
+// Generate 2000 random markers and add them to the cluster group directly
+for (var i = 0; i < 5000; i++) {
+    markers.addLayer(L.marker([Math.random() * 180 - 90, Math.random() * 360 - 180]));
+}
+
+// Add the marker cluster group to the map
+leafletMap.addLayer(markers);
+
+`, Prism.languages.javascript, 'javascript');
+
+// Generate random points globally
+const features = Array.from({ length: 5000 }, () => new ol.Feature(new ol.geom.Point(ol.proj.fromLonLat([Math.random() * 360 - 180, Math.random() * 180 - 90]))));
+
+const clusterSource = new ol.source.Cluster({
+    distance: 80,
+    source: new ol.source.Vector({ features }),
+});
+
+const styleCache = {};
+const clusters = new ol.layer.Vector({
+    source: clusterSource,
+    style: (feature) => {
+        const size = feature.get("features").length;
+        return styleCache[size] = styleCache[size] || new ol.style.Style({
+            image: new ol.style.Circle({
+                radius: 10,
+                fill: new ol.style.Fill({ color: "#ff6b6b" }),
+            }),
+            text: new ol.style.Text({
+                text: size.toString(),
+                fill: new ol.style.Fill({ color: "#fff" }),
+            }),
+        });
+    },
+});
+
+const openLayersMap = new ol.Map({
+    layers: [
+        new ol.layer.Tile({ source: new ol.source.OSM() }),
+        clusters
+    ],
+    target: "openlayers-map",
+    view: new ol.View({
+        center: ol.proj.fromLonLat([0, 50]),
+        zoom: 2,
+    }),
+});
+
+openLayersMap.on("singleclick", function(evt) {
+    openLayersMap.forEachFeatureAtPixel(evt.pixel, function(feature, layer) {
+        const features = feature.get("features");
+        if (features.length > 1) {
+            const extent = features.reduce((extent, feature) => ol.extent.extend(extent, feature.getGeometry().getExtent()), ol.extent.createEmpty());
+            openLayersMap.getView().fit(extent, {
+                duration: 1000,
+                padding: [50, 50, 50, 50],
+            });
+        }
+    });
+});
+
+
+
+document.getElementById('openlayers-code-content').innerHTML = Prism.highlight(`
+// Generate random points globally
+const features = Array.from({ length: 5000 }, () => new ol.Feature(new ol.geom.Point(ol.proj.fromLonLat([Math.random() * 360 - 180, Math.random() * 180 - 90]))));
+
+const clusterSource = new ol.source.Cluster({
+    distance: 80,
+    source: new ol.source.Vector({ features }),
+});
+
+const styleCache = {};
+const clusters = new ol.layer.Vector({
+    source: clusterSource,
+    style: (feature) => {
+        const size = feature.get("features").length;
+        return styleCache[size] = styleCache[size] || new ol.style.Style({
+            image: new ol.style.Circle({
+                radius: 10,
+                fill: new ol.style.Fill({ color: "#ff6b6b" }),
+            }),
+            text: new ol.style.Text({
+                text: size.toString(),
+                fill: new ol.style.Fill({ color: "#fff" }),
+            }),
+        });
+    },
+});
+
+const openLayersMap = new ol.Map({
+    layers: [
+        new ol.layer.Tile({ source: new ol.source.OSM() }),
+        clusters
+    ],
+    target: "openlayers-map",
+    view: new ol.View({
+        center: ol.proj.fromLonLat([0, 50]),
+        zoom: 1,
+    }),
+});
+
+openLayersMap.on("singleclick", function(evt) {
+    openLayersMap.forEachFeatureAtPixel(evt.pixel, function(feature, layer) {
+        const features = feature.get("features");
+        if (features.length > 1) {
+            const extent = features.reduce((extent, feature) => ol.extent.extend(extent, feature.getGeometry().getExtent()), ol.extent.createEmpty());
+            openLayersMap.getView().fit(extent, {
+                duration: 1000,
+                padding: [50, 50, 50, 50],
+            });
+        }
+    });
+});
+
+`, Prism.languages.javascript, 'javascript');;
+            </script>
+</body>
+
+</html>
