@@ -12,7 +12,7 @@
         body {
             display: flex;
             flex-direction: column;
-            justify-content: center;
+            justify-content: flex-start;
             align-items: center;
             height: 100vh;
             background: url('https://images.pexels.com/photos/172277/pexels-photo-172277.jpeg') no-repeat center center fixed;
@@ -25,49 +25,49 @@
         h1 {
             color: white;
             font-family: 'Montserrat', sans-serif;
-            font-size: 44px;
+            font-size: 36px;
             text-shadow: 2px 2px 5px rgba(0, 0, 0, 0.7);
-            margin-top: 20px;
+            margin-top: 40px;
             text-align: center;
         }
 
         .card-container {
             display: flex;
-            flex-wrap: wrap;
+            flex-direction: column;
             justify-content: center;
             align-items: center;
-            margin-top: 20px;
+            margin-top: 40px;
         }
 
         .card {
             background: linear-gradient(to right, #ffbb80, #ff9e54);
             border-radius: 15px;
-            width: 350px;
-            height: 150px;
+            width: 300px;
+            height: 100px;
             margin: 20px;
             display: flex;
             justify-content: center;
             align-items: center;
             text-decoration: none;
             color: white;
-            font-size: 22px;
+            font-size: 18px;
             text-align: center;
-            padding: 20px;
+            padding: 10px;
             box-shadow: 5px 10px 18px rgba(0, 0, 0, 0.25);
             transition: all 0.5s ease-in-out;
             font-weight: bold;
         }
 
         .card:hover {
-            transform: scale(1.1) translateY(-10px);
+            transform: scale(1.1) translateY(-5px);
             box-shadow: 5px 15px 18px rgba(0, 0, 0, 0.5);
             background: linear-gradient(to right, #ffab6c, #ff8f3c);
         }
 
         @media only screen and (max-width: 600px) {
             /* CSS rules for screens smaller than 600px */
-            .card-container {
-                flex-direction: column;
+            h1 {
+                font-size: 28px;
             }
 
             .card {
@@ -75,7 +75,7 @@
             }
 
             .card p {
-                font-size: 18px;
+                font-size: 16px;
             }
         }
     </style>
@@ -84,11 +84,21 @@
     <h1>Leaflet vs OpenLayers: Code Comparison</h1>
     <div class="card-container">
         <a href="ikimap.html" class="card">
-            <p>A simple map with a marker and popup</p>
+            <p>Single marker and popup</p>
         </a>
         <a href="clustermaps.html" class="card">
-            <p>A simple map with marker clustering</p>
+            <p>Marker clustering</p>
+        </a>
+        <a href="kmz.html" class="card">
+            <p>Displaying KMZ file</p>
+        </a>
+        <a href="api.html" class="card">
+            <p>API Call and response to JSON</p>
         </a>
     </div>
 </body>
 </html>
+
+
+
+

@@ -1,0 +1,292 @@
+<!DOCTYPE html>
+<html lang="en">
+
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>A simple map with API Call</title>
+
+
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/leaflet.css"
+    integrity="sha512-Zcn6bjR/8RZbLEpLIeOwNtzREBAJnUKESxces60Mpoj+2okopSAcSUIUOseddDm0cxnGQzxIR7vJgsLZbdLE3w=="
+    crossorigin="anonymous" referrerpolicy="no-referrer" />
+
+
+  <link href="https://cdnjs.cloudflare.com/ajax/libs/prism/9000.0.1/themes/prism-coy.min.css" rel="stylesheet" />
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/9000.0.1/prism.min.js"></script>
+
+
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+    }
+
+    .content {
+      max-width: 97%;
+      margin: 0 auto;
+    }
+
+
+    h1,
+    h2,
+    h3 {
+      text-align: center;
+      margin: 10px 0;
+    }
+
+    h2 {
+      font-size: 25px;
+      color: #333;
+      margin-bottom: 1px;
+    }
+
+    h3 {
+      font-size: 20px;
+      color: #d89339;
+      margin-top: 1px;
+    }
+
+
+    .map-container {
+      display: flex;
+      flex-direction: column;
+      margin-bottom: 20px;
+    }
+
+    .maps-row {
+      display: flex;
+      justify-content: space-between;
+      flex-wrap: wrap;
+    }
+
+
+    .map-box {
+      width: 45%;
+      margin-bottom: 20px;
+    }
+
+    .map {
+      height: 300px;
+    }
+
+    pre {
+      background-color: rgb(255, 248, 240);
+      padding: 10px;
+      overflow: auto;
+      white-space: pre-wrap;
+      /* wrap text according to window size */
+      max-height: 400px;
+      /* Adjust the value as needed */
+      border: 1px solid #ddd;
+      /* border to make the box stand out */
+      border-radius: 5px;
+      /* rounded corners for a softer look */
+    }
+  </style>
+
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.7.0/jquery.min.js"
+    integrity="sha512-3gJwYpMe3QewGELv8k/BX9vcqhryRdzRMxVfq6ngyWXwo03GFEzjsUm8Q7RZcHPHksttq7/GFoxjCVUjkjvPdw=="
+    crossorigin="anonymous" referrerpolicy="no-referrer"></script>
+  <script src="https://cdn.jsdelivr.net/npm/ol@v7.4.0/dist/ol.js"></script>
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/ol@v7.4.0/ol.css">
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/leaflet.js"
+    integrity="sha512-BwHfrr4c9kmRkLw6iXFdzcdWV/PGkVgiIyIWLLlTSXzWQzxuSg4DiQUCpauz/EWjgk5TYQqX/kvn9pG1NpYfqg=="
+    crossorigin="anonymous" referrerpolicy="no-referrer"></script>
+  <script src="https://unpkg.com/leaflet-kmz@latest/dist/leaflet-kmz.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/jszip/3.2.2/jszip.min.js"></script>
+
+
+</head>
+
+
+
+<body>
+
+  <div class="content">
+    <h2>Leaflet vs OpenLayers Comparison</h1>
+      <h3>A simple map with API Call</h3>
+
+      <div class="maps-row">
+        <div class="map-box">
+          <div id="leaflet-map" class="map"></div>
+          <div id="leaflet-code">
+            <h2>Leaflet</h2>
+            <pre>
+              <code id="leaflet-code-content"></code>
+            </pre>
+          </div>
+        </div>
+
+        <div class="map-box">
+          <div id="openlayers-map" class="map"></div>
+          <div id="openlayers-code">
+            <h2>OpenLayers</h2>
+            <pre>
+              <code id="openlayers-code-content"></code>
+            </pre>
+          </div>
+        </div>
+      </div>
+
+      <div id="popup" class="ol-popup">
+        <div id="popup-content"></div>
+      </div>
+
+
+      <script>
+
+
+        // Leaflet Map
+        var leafletMap = L.map('leaflet-map').setView([52.2, 6.9], 2);
+
+        // Add a scale control to the map that only shows kilometers
+        L.control.scale({ metric: true, imperial: false }).addTo(leafletMap);
+
+        L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+          maxZoom: 18
+        }).addTo(leafletMap);
+
+        fetch('https://xeno-canto.org/api/2/recordings?query=anser%20anser')
+          .then(response => response.json())
+          .then(data => {
+            data.recordings.forEach(recording => {
+              if (recording.lat && recording.lng && !isNaN(recording.lat) && !isNaN(recording.lng)) {
+                L.marker([recording.lat, recording.lng]).addTo(leafletMap)
+                  .bindPopup(`${recording.en}<br>${recording.cnt}<br><a href="https:${recording.url}" target="_blank">Listen</a>`)
+              }
+            });
+          });
+
+
+
+        document.getElementById('leaflet-code-content').innerHTML = Prism.highlight(`
+// Leaflet Map
+var leafletMap = L.map('leaflet-map').setView([52.2, 6.9], 2);
+
+// Add a scale control to the map that only shows kilometers
+L.control.scale({metric: true, imperial: false}).addTo(leafletMap);
+
+L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+    maxZoom: 18
+}).addTo(leafletMap);
+
+fetch('https://xeno-canto.org/api/2/recordings?query=anser%20anser')
+.then(response => response.json())
+  .then(data => {
+    data.recordings.forEach(recording => {
+      if(recording.lat && recording.lng && !isNaN(recording.lat) && !isNaN(recording.lng)) {
+        L.marker([recording.lat, recording.lng]).addTo(leafletMap)
+          .bindPopup('recording.en' + '<br>' + 'recording.cnt' + '<br><a href="https:' + 'recording.url' + '" target="_blank">Listen</a>')
+      }
+    });
+  });
+
+`, Prism.languages.javascript, 'javascript');
+
+
+
+        // Create a new OpenLayers map instance
+        var openLayersMap = new ol.Map({
+          target: 'openlayers-map',
+          layers: [new ol.layer.Tile({ source: new ol.source.OSM() })],
+          view: new ol.View({ center: ol.proj.fromLonLat([6.9, 52.2]), zoom: 2 })
+        });
+
+        // Add a scale line control to the map
+        openLayersMap.addControl(new ol.control.ScaleLine());
+
+        fetch('https://xeno-canto.org/api/2/recordings?query=anser%20anser')
+          .then(response => response.json())
+          .then(data => {
+            var iconStyle = new ol.style.Style({
+              image: new ol.style.Icon(/** @type {olx.style.IconOptions} */({
+                anchor: [0.5, 1],
+                src: 'https://openlayers.org/en/latest/examples/data/icon.png' // The path to your icon
+              }))
+            });
+
+            var vectorSource = new ol.source.Vector({
+              features: data.recordings
+                .filter(recording => recording.lat && recording.lng)
+                .map(recording => {
+                  var iconFeature = new ol.Feature({
+                    geometry: new ol.geom.Point(ol.proj.transform([parseFloat(recording.lng), parseFloat(recording.lat)], 'EPSG:4326', 'EPSG:3857')),
+                    name: recording.en,
+                    country: recording.cnt,
+                    url: recording.url
+                  });
+
+                  iconFeature.setStyle(iconStyle);
+                  return iconFeature;
+                })
+            });
+
+
+            var vectorLayer = new ol.layer.Vector({
+              source: vectorSource
+            });
+
+            openLayersMap.addLayer(vectorLayer);
+          });
+
+
+
+
+
+        document.getElementById('openlayers-code-content').innerHTML = Prism.highlight(`
+// Create a new OpenLayers map instance
+var openLayersMap = new ol.Map({
+    target: 'openlayers-map',
+    layers: [new ol.layer.Tile({ source: new ol.source.OSM() })],
+    view: new ol.View({ center: ol.proj.fromLonLat([6.9, 52.2]), zoom: 2 })
+});
+
+// Add a scale line control to the map
+openLayersMap.addControl(new ol.control.ScaleLine());
+
+fetch('https://xeno-canto.org/api/2/recordings?query=anser%20anser')
+  .then(response => response.json())
+  .then(data => {
+    var iconStyle = new ol.style.Style({
+      image: new ol.style.Icon(/** @type {olx.style.IconOptions} */ ({
+        anchor: [0.5, 1],
+        src: 'https://openlayers.org/en/latest/examples/data/icon.png' // The path to your icon
+      }))
+    });
+
+  var vectorSource = new ol.source.Vector({
+  features: data.recordings
+    .filter(recording => recording.lat && recording.lng) 
+    .map(recording => {
+      var iconFeature = new ol.Feature({
+        geometry: new ol.geom.Point(ol.proj.transform([parseFloat(recording.lng), parseFloat(recording.lat)], 'EPSG:4326', 'EPSG:3857')),
+        name: recording.en,
+        country: recording.cnt,
+        url: recording.url
+      });
+
+      iconFeature.setStyle(iconStyle);
+      return iconFeature;
+    })
+});
+
+    var vectorLayer = new ol.layer.Vector({
+      source: vectorSource
+    });
+
+    openLayersMap.addLayer(vectorLayer);
+  });
+
+`, Prism.languages.javascript, 'javascript');;
+
+
+
+      </script>
+
+</body>
+
+
+
+
+</html>
